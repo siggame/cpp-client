@@ -1,68 +1,53 @@
 
 #include <iostream>
+#include <string>
+#include <cstdlib>
+#include <cstring>
 #include "network.h"
-#include <boost/program_options.hpp>
 
-namespace po = boost::program_options;
-
-int main(int ac, char* av[])
+int main(int argc, char* argv[])
 {
-   bool verbose = false, veryVerbose = false;
+    int verbosity = 0;
+    std::string conn_addr = "localhost";
+    std::string game_name = "None";
+    int conn_port = 19000;
 
-   //set up options and stuff
-   po::options_description desc("C++ client for SIG-GAME framework");
-   desc.add_options()
-      ("address,a", po::value<std::string>()->default_value("localhost"),
-         "The address of the game server.")
-      ("port,p",po::value<int>()->default_value(19000),
-         "The port of the game server.")
-      ("game,g",po::value<std::string>()->default_value(""),
-         "The name of game to connect to on the server.")
-      ("verbose,v",
-         "Print more output messages.")
-      ("very-verbose,V",
-         "Print even more output messages.")
-      ("help,h",
-         "Displays this message");
-   ;
+    if(argc == 4) //run [address] [game_name] [verbosity]
+    {
+        conn_addr = argv[1];
+        game_name = argv[2];
+        if(strcmp(argv[3], "1") == 0 )
+            verbosity = 1;
+        else if(strcmp(argv[3], "2") == 0)
+            verbosity = 2;
+    }
+    else if(argc == 3) //run [address] [game_name]
+    {
+        conn_addr = argv[1];
+        game_name = argv[2];
+    }
+    else if(argc == 2) //run [game_name]
+    {
+        game_name = argv[1];
+    }
+    else
+    {
+        std::cout << "run [address] [game_name] [verbosity (1,2)]" << std::endl;
+        std::cout << "run [address] [game_name]" << std::endl;
+        std::cout << "run [game_name]" << std::endl;
+        exit(1);
+    }
 
-   //extract options
-   po::variables_map vm;
-   po::store(po::parse_command_line(ac, av, desc), vm);
-   po::notify(vm);
+    std::cout << "address: " << conn_addr << std::endl;
+    std::cout << "port: " << conn_port << std::endl;
+    std::cout << "game name: " << game_name << std::endl;
+    std::cout << "verbosity: " << verbosity << std::endl;
 
-   //display the description if help is needed
-   if(vm.count("help"))
-   {
-      std::cout<<desc<<std::endl;
-      return 1;
-   }
+    //set up connection
+    GameSocket connection;
+    if(!connection.open_server_connection(conn_addr,conn_port))
+        std::cout << "Unable to connect to server." << std::endl;
 
-   //set verbose/very verbose
-   if(vm.count("verbose"))
-   {
-      std::cout<<"Verbose mode."<<std::endl;
-      verbose = true;
-   }
-   if(vm.count("very-verbose"))
-   {
-      std::cout<<"Very-verbose mode."<<std::endl;
-      veryVerbose = true;
-   }
-
-   //set up connection
-   GameSocket connection;
-   std::string address = vm["address"].as<std::string>();
-   int port = vm["port"].as<int>();
-   if(connection.open_server_connection(address,port))
-   {
-      //opened up correctly
-   }
-   else
-   {
-      //failed
-      std::cout<<"Unable to connect to server."<<std::endl;
-   }
-
-   //connection closes automatically
+    //connection closes automatically
+    return 0;
 }
