@@ -3,3 +3,5 @@ def type_convert(type):
         return "int"
     elif type == float:
         return "float"
+    elif type == str:
+        return "std::string";

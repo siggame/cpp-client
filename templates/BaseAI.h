@@ -13,11 +13,7 @@ class BaseAI
     int my_player_id;
 
 %   for datum in globals:
-%       if datum.type == "str":
-    std::string ${datum.name};
-%       else:
     ${type_convert(datum.type)} ${datum.name};
-%       endif
 %   endfor
 
 %   for model in models:
@@ -27,11 +23,7 @@ class BaseAI
 %   endfor
 
 %   for datum in globals:
-%       if model.type == "str":
-    std::string get_${datum.name}(){return ${datum.name};}
-%       else:
     ${type_convert(datum.type)} get_${datum.name}(){return ${datum.name};}
-%       endif
 %   endfor
 
     BaseAI();
