@@ -21,7 +21,7 @@ class ${model.name} : public GameObject
 {
 ## ----------------------------------------------------------- model Constructor
     public:
-    ${model.name}(GameSocket connection, Game* parent_game\
+    ${model.name}(GameSocket* connection, Game* parent_game\
 ## put all members in the constructor
 % for datum in model.data:
 , ${type_convert(datum.type)} ${datum.name}\
