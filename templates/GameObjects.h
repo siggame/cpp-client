@@ -2,6 +2,7 @@
 #define GAME_OBJECTS_H
 
 #include "network.h"
+#include <string>
 
 class GameObject
 {
@@ -40,6 +41,10 @@ ${type_convert(args.type)} ${args.name}\
 %   endif
 % endfor
 );
+% endfor
+
+% for datum in model.data:
+    ${type_convert(datum.type)} ${datum.name};
 % endfor
 };
 
