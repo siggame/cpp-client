@@ -16,7 +16,7 @@ class BaseAI
 %       if datum.type == "str":
     std::string ${datum.name};
 %       else:
-    ${datum.type} ${datum.name};
+    ${type_convert(datum.type)} ${datum.name};
 %       endif
 %   endfor
 
@@ -30,7 +30,7 @@ class BaseAI
 %       if model.type == "str":
     std::string get_${datum.name}(){return ${datum.name};}
 %       else:
-    ${datum.type} get_${datum.name}(){return ${datum.name};}
+    ${type_convert(datum.type)} get_${datum.name}(){return ${datum.name};}
 %       endif
 %   endfor
 

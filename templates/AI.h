@@ -2,7 +2,7 @@
 #define AI_H
 
 #include <string>
-#include "baseAI.h"
+#include "BaseAI.h"
 
 class AI : public BaseAI
 {

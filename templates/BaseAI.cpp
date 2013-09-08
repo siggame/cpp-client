@@ -1,5 +1,5 @@
 
-#include "baseAI.h"
+#include "BaseAI.h"
 
 BaseAI::BaseAI()
 {
