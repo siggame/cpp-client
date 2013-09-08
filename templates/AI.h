@@ -2,6 +2,7 @@
 #define AI_H
 
 #include <string>
+#include "baseAI.h"
 
 class AI : public BaseAI
 {
@@ -15,6 +16,6 @@ class AI : public BaseAI
    bool init();
    bool end();
    bool run();
-}
+};
 
 #endif
