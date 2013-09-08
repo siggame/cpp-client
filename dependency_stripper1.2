@@ -1,0 +1,1 @@
+gcc -M -I .. main.cpp | sed 's/ /\n/g' | grep boost | sed 's/\\$//g' | sort | uniq | (while read i;do x=$(echo $i | sed 's|^\.\./|./|g');mkdir -p $(dirname $x);cp $i $x;done )

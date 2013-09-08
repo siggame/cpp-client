@@ -1,4 +1,4 @@
 cpp-client
 ==========
 
-The C++ client for the SIG-GAME framework.
+Templates for the MegaMiner C++ client
