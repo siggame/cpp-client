@@ -43,6 +43,13 @@ ${type_convert(args.type)} ${args.name}\
 );
 % endfor
 
+##getters
+% for datum in model.data:
+    ${type_convert(datum.type)} get_${datum.name}();
+% endfor
+
+    protected:
+##enlosed data
 % for datum in model.data:
     ${type_convert(datum.type)} ${datum.name};
 % endfor

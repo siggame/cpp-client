@@ -34,5 +34,18 @@ ${type_convert(args.type)} ${args.name}\
 }
 % endfor
 
+##define getters
+% for datum in model.data:
+${type_convert(datum.type)} ${model.name}::get_${datum.name}()
+{
+% if is_primitive(datum.type):
+    return ${datum.name};
+% else:
+    ##some sort of garbage here
+% endif
+}
+
+% endfor
+
 % endfor
 
