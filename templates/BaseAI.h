@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "network.h"
+#include "GameObjects.h"
 
 class BaseAI
 {

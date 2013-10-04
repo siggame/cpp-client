@@ -2,6 +2,7 @@
 #define GAME_OBJECTS_H
 
 #include "network.h"
+#include "Game.h"
 #include <string>
 
 class GameObject
@@ -28,6 +29,8 @@ class ${model.name} : public GameObject
 , ${type_convert(datum.type)} ${datum.name}\
 % endfor
 );
+## ----------------------------------------------------------- Empty Constructor
+    ${model.name}(){}
 ## S 2 FOR FUNC IN FUNCTIONS ---------------------------------------------- func
 ## -------------------------------------------- model.$(func.name}(${func.args})
 ##assume that everything is a bool right now because Russley said to
@@ -49,10 +52,13 @@ ${type_convert(args.type)} ${args.name}\
 % endfor
 
     protected:
+    GameSocket* connection;
+    Game* parent_game;
 ##enlosed data
 % for datum in model.data:
     ${type_convert(datum.type)} ${datum.name};
 % endfor
+
 };
 
 ## E 2 FOR FUNC IN FUNCTIONS ---------------------------------------------- func
