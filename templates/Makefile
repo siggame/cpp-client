@@ -13,10 +13,9 @@ CXXFLAGS += -g
 override CPPFLAGS += -IjsonCpp/include
 
 all: client
-$(objects): $(headers)
 
 client: $(objects)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^
 
 clean:
 	rm -f $(objects) client
