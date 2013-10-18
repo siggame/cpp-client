@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "network.h"
+#include "Game.h"
 
 int main(int argc, char* argv[])
 {
@@ -47,6 +48,11 @@ int main(int argc, char* argv[])
     GameSocket connection;
     if(!connection.open_server_connection(conn_addr,conn_port))
         std::cout << "Unable to connect to server." << std::endl;
+
+    Game game;
+
+    game.connect(connection, conn_addr, conn_port, game_name);
+    game.run();
 
     //connection closes automatically
     return 0;
