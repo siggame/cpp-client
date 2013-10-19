@@ -3,6 +3,7 @@
 
 #include <string>
 #include "BaseAI.h"
+#include "network.h"
 
 class AI : public BaseAI
 {

@@ -3,29 +3,46 @@
 
 #include <string>
 #include <vector>
+#include "AI.h"
 #include "network.h"
+
+class GameOverException
+{
+    public:
+    int winner;
+    std::string reason;
+    GameOverException(int winner, std::string reason):winner(winner),
+                                                      reason(reason){}
+};
 
 class Game
 {
-    public:
-    Game();
+    protected:
+    GameSocket conn;
+    std::string addr;
+    int port;
+    std::string name;
+    AI ai;
 
-    void connect(GameSocket conn, std::string addr, int port, std::string name);
-    void recieve();
-    void wait_for(std::vector<std::string> types);
-    void login();
-    void create_game();
-    void recv_player_id();
-    void init_main();
-    void end_main();
-    void main_loop();
-    void get_log();
-    void update_game(std::string message);
-    void change_add(std::string change);
-    void change_remove(std::string change);
-    void change_update(std::string change);
-    void change_global_update(std::string change);
-    void run();
+    public:
+    Game(GameSocket& conn, std::string addr, int port, std::string name);
+
+    bool connect();
+    std::string recieve();
+    std::string wait_for(std::vector<std::string> types);
+    bool login();
+    bool create_game();
+    bool recv_player_id();
+    bool init_main();
+    bool end_main();
+    bool main_loop();
+    bool get_log();
+    bool update_game(std::string message);
+    bool change_add(std::string change);
+    bool change_remove(std::string change);
+    bool change_update(std::string change);
+    bool change_global_update(std::string change);
+    bool run();
 };
 
 #endif

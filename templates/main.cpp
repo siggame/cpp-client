@@ -46,12 +46,12 @@ int main(int argc, char* argv[])
 
     //set up connection
     GameSocket connection;
-    if(!connection.open_server_connection(conn_addr,conn_port))
-        std::cout << "Unable to connect to server." << std::endl;
+    /*if(!connection.open_server_connection(conn_addr,conn_port))
+        std::cout << "Unable to connect to server." << std::endl;*/
 
-    Game game;
+    Game game(connection, conn_addr, conn_port, game_name);
 
-    game.connect(connection, conn_addr, conn_port, game_name);
+    game.connect();
     game.run();
 
     //connection closes automatically

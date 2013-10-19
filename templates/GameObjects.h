@@ -1,8 +1,10 @@
 #ifndef GAME_OBJECTS_H
 #define GAME_OBJECTS_H
 
+//Forward decleration because of cyclical dependencies
+class Game;
+
 #include "network.h"
-#include "Game.h"
 #include <string>
 
 class GameObject

@@ -1,86 +1,120 @@
 #include "Game.h"
+#include "json/json.h"
 
-Game::Game()
+Game::Game(GameSocket& conn, std::string addr, int port, std::string name)
+{
+    this->conn = conn;
+    this->addr = addr;
+    this->port = port;
+    this->name = name;
+    ai.connection = conn;
+}
+
+bool Game::connect()
+{
+    return conn.open_server_connection(addr,port);
+}
+
+std::string Game::recieve()
+{
+    std::string message = conn.rec_string();
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(message,root,false);
+    if(root["type"] == "changes")
+    {
+        update_game(message);
+    }
+    else if(root["type"] == "player_id")
+    {
+        ai.my_player_id = root["type"]["id"].asInt();
+    }
+    else if(root["type"] == "game_over")
+    {
+        throw GameOverException(root["args"]["winner"].asInt(),
+                                root["args"]["reason"].asString());
+    }
+    return message;
+}
+
+std::string Game::wait_for(std::vector<std::string> types)
+{
+    while(true)
+    {
+        std::string message = conn.rec_string();
+        for(int i = 0; i < types.size(); i++)
+        {
+            if(message == types[i])
+            {
+                return message;
+            }
+        }
+    }
+}
+
+bool Game::login()
+{
+    Json::Value event;
+    std::string login_message;
+    login_message = event.asInt();
+}
+
+bool Game::create_game()
 {
     ;
 }
 
-void Game::connect(GameSocket conn, std::string addr, int port, std::string name)
+bool Game::recv_player_id()
 {
     ;
 }
 
-void Game::recieve()
+bool Game::init_main()
 {
     ;
 }
 
-void Game::wait_for(std::vector<std::string> types)
+bool Game::end_main()
 {
     ;
 }
 
-void Game::login()
+bool Game::main_loop()
 {
     ;
 }
 
-void Game::create_game()
+bool Game::get_log()
 {
     ;
 }
 
-void Game::recv_player_id()
+bool Game::update_game(std::string message)
 {
     ;
 }
 
-void Game::init_main()
+bool Game::change_add(std::string change)
 {
     ;
 }
 
-void Game::end_main()
+bool Game::change_remove(std::string change)
 {
     ;
 }
 
-void Game::main_loop()
+bool Game::change_update(std::string change)
 {
     ;
 }
 
-void Game::get_log()
+bool Game::change_global_update(std::string change)
 {
     ;
 }
 
-void Game::update_game(std::string message)
-{
-    ;
-}
-
-void Game::change_add(std::string change)
-{
-    ;
-}
-
-void Game::change_remove(std::string change)
-{
-    ;
-}
-
-void Game::change_update(std::string change)
-{
-    ;
-}
-
-void Game::change_global_update(std::string change)
-{
-    ;
-}
-
-void Game::run()
+bool Game::run()
 {
     ;
 }
