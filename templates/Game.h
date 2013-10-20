@@ -28,7 +28,7 @@ class Game
     Game(GameSocket& conn, std::string addr, int port, std::string name);
 
     bool connect();
-    std::string recieve();
+    std::string receive();
     std::string wait_for(std::vector<std::string> types);
     bool login();
     bool create_game();

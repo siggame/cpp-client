@@ -15,7 +15,7 @@ bool Game::connect()
     return conn.open_server_connection(addr,port);
 }
 
-std::string Game::recieve()
+std::string Game::receive()
 {
     std::string message = conn.rec_string();
     Json::Value root;
