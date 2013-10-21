@@ -2,6 +2,7 @@
 #include "json/json.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 Game::Game(GameSocket& conn, std::string addr, int port, std::string name)
 {
@@ -39,7 +40,7 @@ std::string Game::receive()
     return message;
 }
 
-std::string Game::wait_for(std::vector<std::string> types)
+std::string Game::wait_for(std::vector<std::string>& types)
 {
     while(true)
     {
@@ -49,7 +50,7 @@ std::string Game::wait_for(std::vector<std::string> types)
         reader.parse(message,root,false);
         for(int i = 0; i < types.size(); i++)
         {
-            if(root["type"] == types[i])
+            if(root["type"].asString() == types[i])
             {
                 return message;
             }
@@ -57,14 +58,26 @@ std::string Game::wait_for(std::vector<std::string> types)
     }
 }
 
+const std::string login_string =
+"{\"type\": \"login\", \"args\": {\"username\": \"\", \"password\": \"\", \"connection_type\": ${fix_name(repr(name))}}}";
+
 bool Game::login()
 {
     Json::Value event;
+    Json::Reader reader_login;
+    reader_login.parse(login_string,event,false);
+
     event["args"]["username"] = ai.username();
     event["args"]["password"] = ai.password();
 
+    std::stringstream converter;
     std::string login_message;
-    login_message = event.asInt();
+
+    //event.asString() does not work
+    converter<<event<<std::endl;
+    login_message = converter.str();
+
+    std::cout<<"sending: "<<login_message<<std::endl;
 
     conn.send_string(login_message);
 
@@ -88,21 +101,24 @@ bool Game::login()
 }
 
 //create game constant stuff
-const std::string jsonInfo =
-"login = {\"type\": \"login\", \"args\": {\"username\": \"\", \"password\": \"\", \"connection_type\": ${repr(name)}}}"
-"create_game = {\"type\": \"join_game\", \"args\": {}}"
-"function_call = {\"type\": \"command_name\", \"args\": {\"actor\": 0}}"
-"end_turn = {\"type\": \"end_turn\", \"args\": {}}"
-"get_log = {\"type\": \"get_log\", \"args\": {}}";
+const std::string create_game_string =
+"{\"type\": \"join_game\", \"args\": {}}";
 
 bool Game::create_game()
 {
     Json::Value root;
     Json::Reader reader;
-    reader.parse(jsonInfo,root,false);
+    reader.parse(create_game_string,root,false);
     root["args"]["game_name"] = name;
 
-    conn.send_string(root.asString());
+    std::stringstream converter;
+    std::string messageSend;
+    converter << root;
+    messageSend = converter.str();
+
+    std::cout<<"sent: "<<messageSend<<std::endl;
+
+    conn.send_string(messageSend);
 
     std::vector<std::string> wanted;
     wanted.push_back("success");
@@ -245,16 +261,37 @@ bool Game::change_add(std::string change)
     Json::Value root;
     Json::Reader reader;
     reader.parse(change,root,false);
+
+    Json::Value values = root["values"];
+    if(false){}
+% for model in models:
+% if model.type == "Model":
+    else if(root["type"].asString() == "${model.name}")
+    {
+        ${model.name} temp(&conn,this\
+% for datum in model.data:
+, values["${datum.name}"].as${type_convert2(datum.type)}()\
+% endfor
+);
+        ai.${lowercase(model.plural)}.push_back(temp);
+    }
+% endif
+% endfor
+    else
+    {
+        std::cout<<"Unknown model attempted to add!!"<<std::endl;
+    }
+    return true;
 }
 
 bool Game::change_remove(std::string change)
 {
-    ;
+    return true;
 }
 
 bool Game::change_update(std::string change)
 {
-    ;
+    return true;
 }
 
 bool Game::change_global_update(std::string change)
@@ -263,15 +300,16 @@ bool Game::change_global_update(std::string change)
     Json::Reader reader;
     reader.parse(change,root,false);
 
-    Json::Value changes = root["values"];
-    for(int i = 0;i < changes.size(); i++)
+    Json::Value values = root["values"];
+    for(int i = 0;i < root.size(); i++)
     {
         //Hey this code looks funny, I wonder why?
+        //[Note that this was the original]
         if(false){}
 % for datum in globals:
-        else if(changes[i].asString() == "${datum.name}")
+        else if(root[i].asString() == "${datum.name}")
         {
-            ai.${datum.name} = changes[i]["${datum.name}"].as${type_convert2(datum.type)}();
+            ai.${datum.name} = values[i]["${datum.name}"].as${type_convert2(datum.type)}();
         }
 % endfor
         else
@@ -279,9 +317,63 @@ bool Game::change_global_update(std::string change)
             std::cout<<"Error: Unknown global update!!"<<std::endl;
         }
     }
+    return true;
 }
 
 bool Game::run()
 {
-    ;
+    std::string game_over_message;
+    if(!connect())
+    {
+        return false;
+    }
+    if(!login())
+    {
+        return false;
+    }
+    if(!create_game())
+    {
+        return false;
+    }
+    if(!recv_player_id())
+    {
+        return false;
+    }
+    if(!init_main())
+    {
+        return false;
+    }
+
+    try
+    {
+        main_loop();
+    }
+    catch(GameOverException e)
+    {
+        if(e.winner == ai.my_player_id)
+        {
+            game_over_message = "You Win! - " + e.reason;
+        }
+        else
+        {
+            game_over_message = "You Lose! - " + e.reason;
+        }
+    }
+    catch(...)
+    {
+        game_over_message = "Game over was never reached.";
+    }
+
+    if(!end_main())
+    {
+        return false;
+    }
+
+    std::cout<<game_over_message<<std::endl;
+
+    if(!get_log())
+    {
+        return false;
+    }
+    return true;
 }

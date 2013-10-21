@@ -29,7 +29,7 @@ class Game
 
     bool connect();
     std::string receive();
-    std::string wait_for(std::vector<std::string> types);
+    std::string wait_for(std::vector<std::string>& types);
     bool login();
     bool create_game();
     bool recv_player_id();

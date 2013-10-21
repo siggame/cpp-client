@@ -88,7 +88,7 @@ bool GameSocket::send_string(const string payload) {
 
     // now, keep sending chunks of the payload
     // until we send the whole thing
-    
+
 
     while(offset < length)
     {
@@ -143,7 +143,7 @@ string GameSocket::rec_string()
         buffer_length = length;
     }
 
-    while(bytes_left_to_read > 0)
+    while(bytes_left_to_read - received > 0)
     {
         numbytes = 0;
         if((numbytes = recv(sock, buffer+received,

@@ -23,3 +23,8 @@ def is_primitive(type):
     elif type == str:
         return True
     return False
+
+#JSONcpp requires double quotes
+def fix_name(name):
+   name2 = name[1:-1]
+   return "\\\"" + name2 + "\\\""
