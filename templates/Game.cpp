@@ -242,7 +242,9 @@ bool Game::update_game(std::string message)
 
 bool Game::change_add(std::string change)
 {
-    ;
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(message,root,false);
 }
 
 bool Game::change_remove(std::string change)
