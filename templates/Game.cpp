@@ -244,7 +244,7 @@ bool Game::change_add(std::string change)
 {
     Json::Value root;
     Json::Reader reader;
-    reader.parse(message,root,false);
+    reader.parse(change,root,false);
 }
 
 bool Game::change_remove(std::string change)
@@ -259,7 +259,26 @@ bool Game::change_update(std::string change)
 
 bool Game::change_global_update(std::string change)
 {
-    ;
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(change,root,false);
+
+    Json::Value changes = root["values"];
+    for(int i = 0;i < changes.size(); i++)
+    {
+        //Hey this code looks funny, I wonder why?
+        if(false){}
+% for datum in globals:
+        else if(changes[i].asString() == "${datum.name}")
+        {
+            ai.${datum.name} = changes[i]["${datum.name}"].as${type_convert2(datum.type)}();
+        }
+% endfor
+        else
+        {
+            std::cout<<"Error: Unknown global update!!"<<std::endl;
+        }
+    }
 }
 
 bool Game::run()

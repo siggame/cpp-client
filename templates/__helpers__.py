@@ -6,6 +6,15 @@ def type_convert(type):
     elif type == str:
         return "std::string";
 
+#for conversion during the Json value grabbing
+def type_convert2(type):
+    if type == int:
+        return "Int"
+    elif type == float:
+        return "Float"
+    elif type == str:
+        return "String";
+
 def is_primitive(type):
     if type == int:
         return True
