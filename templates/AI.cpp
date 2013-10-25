@@ -1,5 +1,6 @@
 
 #include "AI.h"
+#include <iostream>
 
 AI::AI()
 {
@@ -28,8 +29,5 @@ bool AI::end()
 
 bool AI::run()
 {
-    //debug code [GAME SPECIFIC; BAD REMOVE IT LATER]
-    if(bases.size() > 0)
-        bases[0].spawn(1);
    return true;
 }

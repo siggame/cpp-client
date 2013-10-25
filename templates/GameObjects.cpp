@@ -1,5 +1,6 @@
 #include "GameObjects.h"
 #include "json/json.h"
+#include "Game.h"
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -45,11 +46,38 @@ ${type_convert(args.type)} ${args.name}\
 %   for args in func.arguments:
     convert << ${args.name};
     root["args"][${double_quotes(repr(args.name))}] = convert.str();
-    convert.clear();
+    convert.str(std::string());
 %   endfor
 
     convert << root;
     std::cout << root << std::endl;
+
+    connection->send_string(convert.str());
+    bool recievedStatus = false;
+    bool status;
+
+    while(!recievedStatus)
+    {
+        std::string message = connection->rec_string();
+        Json::Value root2;
+        Json::Reader reader_login2;
+        reader_login2.parse(function_call,root2,false);
+        if(root2["type"] == "success")
+        {
+            recievedStatus = true;
+            status = true;
+        }
+        else if(root2["type"] == "failure")
+        {
+            recievedStatus = true;
+            status = false;
+        }
+        else if(root2["type"] == "changes")
+        {
+            parent_game->update_game(message);
+        }
+    }
+    return status;
 }
 % endfor
 
