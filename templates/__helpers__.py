@@ -28,3 +28,8 @@ def is_primitive(type):
 def fix_name(name):
    name2 = name[1:-1]
    return "\\\"" + name2 + "\\\""
+
+#for accessing elements by name in JSONcpp array
+def double_quotes(name):
+   name2 = name[1:-1]
+   return "\"" + name2 + "\""

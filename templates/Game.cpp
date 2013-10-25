@@ -24,15 +24,15 @@ std::string Game::receive()
     Json::Value root;
     Json::Reader reader;
     reader.parse(message,root,false);
-    if(root["type"] == "changes")
+    if(root["type"].asString() == "changes")
     {
         update_game(message);
     }
-    else if(root["type"] == "player_id")
+    else if(root["type"].asString() == "player_id")
     {
-        ai.my_player_id = root["type"]["id"].asInt();
+        ai.my_player_id = root["args"]["id"].asInt();
     }
-    else if(root["type"] == "game_over")
+    else if(root["type"].asString() == "game_over")
     {
         throw GameOverException(root["args"]["winner"].asInt(),
                                 root["args"]["reason"].asString());
@@ -44,7 +44,7 @@ std::string Game::wait_for(std::vector<std::string>& types)
 {
     while(true)
     {
-        std::string message = conn.rec_string();
+        std::string message = receive();
         Json::Value root;
         Json::Reader reader;
         reader.parse(message,root,false);
@@ -76,8 +76,6 @@ bool Game::login()
     //event.asString() does not work
     converter<<event<<std::endl;
     login_message = converter.str();
-
-    std::cout<<"sending: "<<login_message<<std::endl;
 
     conn.send_string(login_message);
 
@@ -115,8 +113,6 @@ bool Game::create_game()
     std::string messageSend;
     converter << root;
     messageSend = converter.str();
-
-    std::cout<<"sent: "<<messageSend<<std::endl;
 
     conn.send_string(messageSend);
 
@@ -168,7 +164,7 @@ bool Game::end_main()
 }
 
 const std::string end_turn_string =
-"end_turn = {\"type\": \"end_turn\", \"args\": {}}";
+"{\"type\": \"end_turn\", \"args\": {}}";
 
 bool Game::main_loop()
 {
@@ -198,7 +194,7 @@ bool Game::main_loop()
 }
 
 const std::string get_log_string =
-"get_log = {\"type\": \"get_log\", \"args\": {}}";
+"{\"type\": \"get_log\", \"args\": {}}";
 
 bool Game::get_log()
 {
@@ -221,6 +217,7 @@ bool Game::get_log()
         fout << root["args"]["log"].asString();
         fout.close();
     }
+    return true;
 }
 
 bool Game::update_game(std::string message)
@@ -229,30 +226,36 @@ bool Game::update_game(std::string message)
     Json::Reader reader;
     reader.parse(message,root,false);
 
-    if(root["type"] != "changes")
+    if(root["type"].asString() != "changes")
+    {
         return false;
+    }
 
     Json::Value changes = root["args"]["changes"];
+    std::stringstream convert;
 
     for(int i = 0; i < changes.size(); i++)
     {
+        convert<<changes[i];
         if(changes[i]["action"].asString() == "add")
         {
-            change_add(changes[i].asString());
+            change_add(convert.str());
         }
         else if(changes[i]["action"].asString() == "remove")
         {
-            change_remove(changes[i].asString());
+            change_remove(convert.str());
         }
         else if(changes[i]["action"].asString() == "update")
         {
-            change_update(changes[i].asString());
+            change_update(convert.str());
         }
         else if(changes[i]["action"].asString() == "global_update")
         {
-            change_global_update(changes[i].asString());
+            change_global_update(convert.str());
         }
+        convert.str(std::string());
     }
+
     return true;
 }
 
@@ -286,12 +289,57 @@ bool Game::change_add(std::string change)
 
 bool Game::change_remove(std::string change)
 {
-    return true;
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(change,root,false);
+    Json::Value null_value;
+
+    int change_id = root["id"].asInt();
+
+%   for model in models:
+%   if model.type == "Model":
+
+    for(int i = 0;i < ai.${lowercase(model.plural)}.size();i++)
+    {
+        if(ai.${lowercase(model.plural)}[i].id == change_id)
+        {
+            ai.${lowercase(model.plural)}.erase(ai.${lowercase(model.plural)}.begin()+i);
+            return true;
+        }
+    }
+%   endif
+%   endfor
+    return false;
 }
 
 bool Game::change_update(std::string change)
 {
-    return true;
+    Json::Value root;
+    Json::Reader reader;
+    reader.parse(change,root,false);
+    Json::Value null_value;
+
+    int change_id = root["id"].asInt();
+
+%   for model in models:
+%   if model.type == "Model":
+
+    for(int i = 0;i < ai.${lowercase(model.plural)}.size();i++)
+    {
+        if(ai.${lowercase(model.plural)}[i].id == change_id)
+        {
+%           for datum in model.data:
+            if(root["changes"]["${datum.name}"] != null_value)
+            {
+                ai.${lowercase(model.plural)}[i].${datum.name} = root["changes"]["${datum.name}"].as${type_convert2(datum.type)}();
+            }
+%           endfor
+            return true;
+        }
+    }
+%   endif
+%   endfor
+    return false;
 }
 
 bool Game::change_global_update(std::string change)
@@ -299,24 +347,14 @@ bool Game::change_global_update(std::string change)
     Json::Value root;
     Json::Reader reader;
     reader.parse(change,root,false);
+    Json::Value null_value;
 
-    Json::Value values = root["values"];
-    for(int i = 0;i < root.size(); i++)
-    {
-        //Hey this code looks funny, I wonder why?
-        //[Note that this was the original]
-        if(false){}
 % for datum in globals:
-        else if(root[i].asString() == "${datum.name}")
-        {
-            ai.${datum.name} = values[i]["${datum.name}"].as${type_convert2(datum.type)}();
-        }
-% endfor
-        else
-        {
-            std::cout<<"Error: Unknown global update!!"<<std::endl;
-        }
+    if(root["values"]["${datum.name}"] != null_value)
+    {
+        ai.${datum.name} = root["values"]["${datum.name}"].as${type_convert2(datum.type)}();
     }
+% endfor
     return true;
 }
 

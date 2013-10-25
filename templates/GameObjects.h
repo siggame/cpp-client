@@ -53,7 +53,7 @@ ${type_convert(args.type)} ${args.name}\
     ${type_convert(datum.type)} get_${datum.name}();
 % endfor
 
-    protected:
+    //protected:
     GameSocket* connection;
     Game* parent_game;
 ##enlosed data
