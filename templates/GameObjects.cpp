@@ -50,7 +50,7 @@ ${type_convert(args.type)} ${args.name}\
 %   endfor
 
     convert << root;
-    std::cout << root << std::endl;
+    //std::cout << root << std::endl;
 
     connection->send_string(convert.str());
     bool recievedStatus = false;

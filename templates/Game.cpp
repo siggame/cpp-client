@@ -186,7 +186,7 @@ bool Game::main_loop()
 
         if(ai.my_player_id == ai.player_id)
         {
-            std::cout<<"Turn Number: "<<ai.turn_number<<std::endl;
+            //std::cout<<"Turn Number: "<<ai.turn_number<<std::endl;
             ai.run();
             conn.send_string(end_turn_string);
         }
