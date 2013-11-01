@@ -1,4 +1,6 @@
 
+int verbosity;
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -18,9 +20,14 @@ int main(int argc, char* argv[])
         conn_addr = argv[1];
         game_name = argv[2];
         if(strcmp(argv[3], "1") == 0 )
+        {
             verbosity = 1;
+
+        }
         else if(strcmp(argv[3], "2") == 0)
+        {
             verbosity = 2;
+        }
     }
     else if(argc == 3) //run [address] [game_name]
     {
@@ -39,17 +46,20 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    std::cout << "address: " << conn_addr << std::endl;
-    std::cout << "port: " << conn_port << std::endl;
-    std::cout << "game name: " << game_name << std::endl;
-    std::cout << "verbosity: " << verbosity << std::endl;
+    if(verbosity >= 1)
+    {
+        std::cout << "address: " << conn_addr << std::endl;
+        std::cout << "port: " << conn_port << std::endl;
+        std::cout << "game name: " << game_name << std::endl;
+        std::cout << "verbosity: " << verbosity << std::endl;
+    }
 
     //set up connection
     GameSocket connection;
     /*if(!connection.open_server_connection(conn_addr,conn_port))
         std::cout << "Unable to connect to server." << std::endl;*/
 
-    Game game(connection, conn_addr, conn_port, game_name);
+    Game game(connection, conn_addr, conn_port, game_name, verbosity);
 
     game.connect();
     game.run();

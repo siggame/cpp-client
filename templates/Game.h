@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+extern int verbosity;
+
 #include <string>
 #include <vector>
 #include "AI.h"
@@ -25,7 +27,8 @@ class Game
     AI ai;
 
     public:
-    Game(GameSocket& conn, std::string addr, int port, std::string name);
+    Game(GameSocket& conn, std::string addr, int port, std::string name,
+         int verbosity2 = 0);
 
     bool connect();
     std::string receive();

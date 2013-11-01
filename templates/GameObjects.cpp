@@ -52,6 +52,10 @@ ${type_convert(args.type)} ${args.name}\
     convert << root;
     //std::cout << root << std::endl;
 
+    if(verbosity == 2)
+    {
+        std::cout<<"Sent: "<<convert.str()<<'\n';
+    }
     connection->send_string(convert.str());
     bool recievedStatus = false;
     bool status;
@@ -88,7 +92,8 @@ ${type_convert(datum.type)} ${model.name}::get_${datum.name}()
 % if is_primitive(datum.type):
     return ${datum.name};
 % else:
-    ##some sort of garbage here
+##  I don't know if this works, if it doesn't yell at me and I'll take a look
+    return ${datum.name};
 % endif
 }
 

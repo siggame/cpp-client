@@ -4,13 +4,15 @@
 #include <fstream>
 #include <sstream>
 
-Game::Game(GameSocket& conn, std::string addr, int port, std::string name)
+Game::Game(GameSocket& conn, std::string addr, int port, std::string name,
+           int verbosity2)
 {
     this->conn = conn;
     this->addr = addr;
     this->port = port;
     this->name = name;
     ai.connection = conn;
+    verbosity = verbosity2;
 }
 
 bool Game::connect()
@@ -21,6 +23,10 @@ bool Game::connect()
 std::string Game::receive()
 {
     std::string message = conn.rec_string();
+    if(verbosity == 2)
+    {
+        std::cout<<"Recieved: "<<message<<std::endl;
+    }
     Json::Value root;
     Json::Reader reader;
     reader.parse(message,root,false);
@@ -77,6 +83,10 @@ bool Game::login()
     converter<<event<<std::endl;
     login_message = converter.str();
 
+    if(verbosity == 2)
+    {
+        std::cout<<"Sent: "<<login_message<<'\n';
+    }
     conn.send_string(login_message);
 
     std::vector<std::string> wanted;
@@ -114,6 +124,10 @@ bool Game::create_game()
     converter << root;
     messageSend = converter.str();
 
+    if(verbosity == 2)
+    {
+        std::cout<<"Sent: "<<messageSend<<'\n';
+    }
     conn.send_string(messageSend);
 
     std::vector<std::string> wanted;
@@ -186,8 +200,15 @@ bool Game::main_loop()
 
         if(ai.my_player_id == ai.player_id)
         {
-            //std::cout<<"Turn Number: "<<ai.turn_number<<std::endl;
+            if(verbosity >= 1)
+            {
+                std::cout<<"Turn Number: "<<ai.turn_number<<std::endl;
+            }
             ai.run();
+            if(verbosity == 2)
+            {
+                std::cout<<"Sent: "<<end_turn_string<<'\n';
+            }
             conn.send_string(end_turn_string);
         }
     }
@@ -198,6 +219,10 @@ const std::string get_log_string =
 
 bool Game::get_log()
 {
+    if(verbosity == 2)
+    {
+        std::cout<<"Sent: "<<get_log_string<<'\n';
+    }
     conn.send_string(get_log_string);
 
     std::vector<std::string> wanted;
