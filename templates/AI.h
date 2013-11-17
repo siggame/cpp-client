@@ -12,7 +12,7 @@ class AI : public BaseAI
 {
    public:
 
-   AI();
+   AI(){};
 
    std::string username();
    std::string password();
