@@ -7,11 +7,6 @@ std::string AI::username()
    return "username";
 }
 
-std::string AI::password()
-{
-   return "password";
-}
-
 /// @fn init
 ///  @breif Initialization function that is ran before the game begins.
 bool AI::init()
